@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.claude
+Referencias
+*.md
+!README.md
+.env*
+npm-debug.log*
