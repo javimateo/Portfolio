@@ -1,0 +1,90 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Javier Mateo — hexagon monogram, line-art version.
+    Soft-rounded hexagon + hollow "JM" letters, both stroke-only
+    (no fill), so whatever sits behind the mark shows through —
+    built for stroke draw-on animation in Jitter.
+
+    Groups (visible by default, each independently animatable):
+      - "hex-outline": soft-rounded hexagon outline
+      - "jm-letters": hollow "JM" letters, stroke only
+
+    Optional extra (hidden by default — toggle visibility in Jitter
+    if you want a solid "fill/zoom" stage): "hex-fill-cutout", a
+    solid hexagon with the JM letters cut out as see-through holes.
+  -->
+
+  <g id="hex-outline">
+    <path
+      d="M 50.68,59.14
+         L 104.32,28.86
+         Q 120,20 135.68,28.86
+         L 189.32,59.14
+         Q 205,68 205,86
+         L 205,154
+         Q 205,172 189.32,180.86
+         L 135.68,211.14
+         Q 120,220 104.32,211.14
+         L 50.68,180.86
+         Q 35,172 35,154
+         L 35,86
+         Q 35,68 50.68,59.14
+         Z"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="6"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+  </g>
+
+  <g id="jm-letters">
+    <text
+      x="120"
+      y="142"
+      text-anchor="middle"
+      font-family="'Baloo 2', 'Poppins', 'Arial Rounded MT Bold', sans-serif"
+      font-weight="800"
+      font-size="72"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="3.5"
+      stroke-linejoin="round"
+    >JM</text>
+  </g>
+
+  <g id="hex-fill-cutout" display="none">
+    <defs>
+      <mask id="jm-cutout-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="240">
+        <rect x="0" y="0" width="240" height="240" fill="#ffffff" />
+        <text
+          x="120"
+          y="142"
+          text-anchor="middle"
+          font-family="'Baloo 2', 'Poppins', 'Arial Rounded MT Bold', sans-serif"
+          font-weight="800"
+          font-size="72"
+          fill="#000000"
+        >JM</text>
+      </mask>
+    </defs>
+    <path
+      d="M 50.68,59.14
+         L 104.32,28.86
+         Q 120,20 135.68,28.86
+         L 189.32,59.14
+         Q 205,68 205,86
+         L 205,154
+         Q 205,172 189.32,180.86
+         L 135.68,211.14
+         Q 120,220 104.32,211.14
+         L 50.68,180.86
+         Q 35,172 35,154
+         L 35,86
+         Q 35,68 50.68,59.14
+         Z"
+      fill="#ffffff"
+      mask="url(#jm-cutout-mask)"
+    />
+  </g>
+</svg>
