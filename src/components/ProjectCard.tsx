@@ -2,7 +2,24 @@
 
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
-import CircularCursor from "./CircularCursor";
+import TiltFrame from "./TiltFrame";
+import ProjectMedia from "./ProjectMedia";
+
+const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
+
+const textContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
+};
+
+const textItem = {
+  hidden: { opacity: 0, y: 18 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
 
 export default function ProjectCard({
   project,
@@ -14,53 +31,50 @@ export default function ProjectCard({
   mediaRef?: (el: HTMLDivElement | null) => void;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    <div
       className={`relative z-10 flex flex-col gap-8 md:gap-4 items-center ${
         reverse ? "md:flex-row-reverse" : "md:flex-row"
       }`}
     >
-      <div ref={mediaRef} className="w-full md:w-3/5">
-        <CircularCursor label="Ver repo">
-          <div className="overflow-hidden rounded-xl border border-white/10 bg-zinc-900">
-            <div className="flex items-center gap-1.5 border-b border-white/10 bg-zinc-950 px-3 py-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-              <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-              <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-            </div>
-            <a
-              href={project.repoUrl ?? "#"}
-              target={project.repoUrl ? "_blank" : undefined}
-              rel="noreferrer"
-              aria-disabled={!project.repoUrl}
-              className={`flex aspect-video items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-950 ${
-                !project.repoUrl ? "pointer-events-none" : ""
-              }`}
-            >
-              <span className="font-display text-4xl font-bold text-white/10">
-                {project.title}
-              </span>
-            </a>
-          </div>
-        </CircularCursor>
-      </div>
+      <motion.div
+        ref={mediaRef}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewport}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full md:w-3/5"
+      >
+        <TiltFrame>
+          <ProjectMedia project={project} />
+        </TiltFrame>
+      </motion.div>
 
-      <div
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={viewport}
+        variants={textContainer}
         className={`w-full md:w-2/5 ${
           reverse ? "md:text-right" : "md:text-left"
         } text-center md:text-left`}
       >
-        <p className="font-mono text-sm uppercase tracking-widest text-accent">
+        <motion.p
+          variants={textItem}
+          className="font-mono text-sm uppercase tracking-widest text-accent"
+        >
           {project.eyebrow}
-        </p>
-        <h3 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
+        </motion.p>
+        <motion.h3
+          variants={textItem}
+          className="mt-2 font-display text-2xl font-bold sm:text-3xl"
+        >
           {project.title}
-        </h3>
-        <p className="mt-4 text-foreground/70">{project.description}</p>
-        <ul
+        </motion.h3>
+        <motion.p variants={textItem} className="mt-4 text-foreground/70">
+          {project.description}
+        </motion.p>
+        <motion.ul
+          variants={textItem}
           className={`mt-4 flex flex-col gap-2 text-sm text-foreground/60 ${
             reverse ? "md:items-end" : "md:items-start"
           } items-center md:text-left text-center`}
@@ -70,8 +84,9 @@ export default function ProjectCard({
               {bullet}
             </li>
           ))}
-        </ul>
-        <ul
+        </motion.ul>
+        <motion.ul
+          variants={textItem}
           className={`mt-5 flex flex-wrap gap-2 ${
             reverse ? "md:justify-end" : "md:justify-start"
           } justify-center`}
@@ -84,13 +99,24 @@ export default function ProjectCard({
               {tech}
             </li>
           ))}
-        </ul>
+        </motion.ul>
         {project.repoUrl && (
-          <div
+          <motion.div
+            variants={textItem}
             className={`mt-5 flex gap-4 ${
               reverse ? "md:justify-end" : "md:justify-start"
             } justify-center`}
           >
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity hover:opacity-80"
+              >
+                Ver en vivo ↗
+              </a>
+            )}
             <a
               href={project.repoUrl}
               target="_blank"
@@ -99,14 +125,17 @@ export default function ProjectCard({
             >
               GitHub ↗
             </a>
-          </div>
+          </motion.div>
         )}
         {!project.repoUrl && (
-          <p className="mt-5 font-mono text-xs uppercase tracking-wider text-foreground/40">
+          <motion.p
+            variants={textItem}
+            className="mt-5 font-mono text-xs uppercase tracking-wider text-foreground/40"
+          >
             Repositorio privado
-          </p>
+          </motion.p>
         )}
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

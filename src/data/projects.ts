@@ -7,6 +7,17 @@ export type Project = {
   stack: string[];
   repoUrl?: string;
   liveUrl?: string;
+  media?: {
+    // "browser" for web apps and APIs, "phone" for mobile apps
+    frame: "browser" | "phone";
+    // screenshots in public/projects; the first is the main one. A phone frame
+    // with three shows them as a fanned trio
+    images?: string[];
+    // short muted clip that plays while the card is hovered (main screen only)
+    video?: string;
+    // renders a live widget instead of a screenshot
+    live?: "terrace-weather";
+  };
 };
 
 export const projects: Project[] = [
@@ -38,6 +49,14 @@ export const projects: Project[] = [
     ],
     stack: ["Flutter", "Dart", "Firebase", "Cloudinary", "Provider"],
     repoUrl: "https://github.com/javimateo/Beer-League",
+    media: {
+      frame: "phone",
+      images: [
+        "/projects/beer-league/01-home.png",
+        "/projects/beer-league/02-group-ranking.png",
+        "/projects/beer-league/08-confirmation.png",
+      ],
+    },
   },
   {
     slug: "terrace-weather-api",
@@ -53,5 +72,10 @@ export const projects: Project[] = [
     ],
     stack: ["Java", "Spring Boot", "Docker", "OpenAPI", "Open-Meteo"],
     repoUrl: "https://github.com/javimateo/terrace-weather-api",
+    liveUrl: "https://terrace.javiermateo.dev/swagger-ui.html",
+    media: {
+      frame: "browser",
+      live: "terrace-weather",
+    },
   },
 ];

@@ -54,8 +54,8 @@ export default function Hero() {
           className="mt-6 text-xl text-foreground/70"
         >
           Desarrollador full-stack especializado en Angular, TypeScript y
-          Node.js. Actualmente cursando el Máster en Ingeniería Informática,
-          buscando mi primera posición como desarrollador.
+          Node.js. Máster en Full Stack Developer por UNIR, buscando mi
+          primera posición como desarrollador.
         </motion.p>
         <motion.div variants={item} className="mt-8 flex gap-4">
           <a

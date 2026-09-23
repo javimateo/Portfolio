@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 
 type Point = { x: number; y: number };
 
+const FILL_DURATION = 2.2; // seconds — how long the line takes to connect top to bottom
+
 export default function ProjectConstellation({
   containerRef,
   anchorRefs,
@@ -46,7 +48,15 @@ export default function ProjectConstellation({
 
   if (points.length < 2 || size.width === 0) return null;
 
-  const segments = points.slice(0, -1).map((p, i) => ({ from: p, to: points[i + 1] }));
+  // One continuous path through every project, plus each segment's share
+  // of the total length so the "star" and each node light up in sync with
+  // how far the line has actually traveled.
+  const path = points.reduce((acc, p, i) => (i === 0 ? `M ${p.x},${p.y}` : `${acc} L ${p.x},${p.y}`), "");
+  const segmentLengths = points.slice(0, -1).map((p, i) => Math.hypot(points[i + 1].x - p.x, points[i + 1].y - p.y));
+  const totalLength = segmentLengths.reduce((a, b) => a + b, 0);
+  const pointFractions = points.map(
+    (_, i) => segmentLengths.slice(0, i).reduce((a, b) => a + b, 0) / totalLength
+  );
 
   return (
     <svg
@@ -56,31 +66,43 @@ export default function ProjectConstellation({
     >
       <defs>
         <filter id="constellation-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.2" result="blur" />
+          <feGaussianBlur stdDeviation="2" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
+        <filter id="constellation-glow-strong" x="-150%" y="-150%" width="400%" height="400%">
+          <feGaussianBlur stdDeviation="4.5" />
+        </filter>
       </defs>
 
-      {segments.map((seg, i) => (
-        <motion.line
-          key={i}
-          x1={seg.from.x}
-          y1={seg.from.y}
-          x2={seg.to.x}
-          y2={seg.to.y}
-          stroke="var(--accent)"
-          strokeWidth="1"
-          strokeLinecap="round"
-          filter="url(#constellation-glow)"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: [0, 0.5, 0.28] }}
-          viewport={{ once: true, margin: "-30% 0px -30% 0px" }}
-          transition={{ duration: 1.4, delay: i * 0.35, ease: "easeOut" }}
-        />
-      ))}
+      {/* the connection itself, filling in smoothly once */}
+      <motion.path
+        d={path}
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        filter="url(#constellation-glow)"
+        initial={{ pathLength: 0, opacity: 0 }}
+        whileInView={{ pathLength: 1, opacity: 0.55 }}
+        viewport={{ once: true, margin: "0px 0px 150px 0px" }}
+        transition={{ duration: FILL_DURATION, ease: [0.4, 0, 0.2, 1] }}
+      />
+
+      {/* bright comet head traveling along the same path, just ahead of the fill */}
+      <motion.circle
+        r={3.5}
+        fill="var(--accent)"
+        filter="url(#constellation-glow-strong)"
+        initial={{ opacity: 0, offsetDistance: "0%" }}
+        whileInView={{ opacity: [0, 1, 1, 0], offsetDistance: "100%" }}
+        viewport={{ once: true, margin: "0px 0px 150px 0px" }}
+        transition={{ duration: FILL_DURATION, ease: [0.4, 0, 0.2, 1] }}
+        style={{ offsetPath: `path("${path}")` }}
+      />
 
       {points.map((p, i) => (
         <motion.circle
@@ -91,9 +113,9 @@ export default function ProjectConstellation({
           fill="var(--accent)"
           filter="url(#constellation-glow)"
           initial={{ scale: 0, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 0.9 }}
-          viewport={{ once: true, margin: "-30% 0px -30% 0px" }}
-          transition={{ duration: 0.5, delay: i * 0.35 }}
+          whileInView={{ scale: 1, opacity: 0.85 }}
+          viewport={{ once: true, margin: "0px 0px 150px 0px" }}
+          transition={{ duration: 0.4, delay: pointFractions[i] * FILL_DURATION }}
         />
       ))}
     </svg>

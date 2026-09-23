@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 
 const LINKS = [
   { id: "inicio", label: "Inicio" },
+  { id: "sobre-mi", label: "Sobre mí" },
   { id: "proyectos", label: "Proyectos" },
   { id: "skills", label: "Skills" },
   { id: "contacto", label: "Contacto" },
@@ -46,7 +47,7 @@ export default function Nav() {
                 linkRefs.current[link.id] = el;
               }}
               href={`#${link.id}`}
-              className={`relative z-10 block whitespace-nowrap rounded-full px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors sm:px-4 sm:py-2 sm:text-xs ${
+              className={`relative z-10 block whitespace-nowrap rounded-full px-[7px] py-1.5 font-mono text-[10px] uppercase tracking-wide transition-colors sm:px-4 sm:py-2 sm:text-xs sm:tracking-wider ${
                 active === link.id
                   ? "text-black"
                   : "text-foreground/70 hover:text-foreground"
