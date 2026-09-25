@@ -22,19 +22,19 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    slug: "segunda-mano",
-    title: "Plataforma de segunda mano",
-    eyebrow: "Proyecto Final del Máster · UNIR",
+    slug: "diaryo",
+    title: "Diaryo",
+    eyebrow: "Proyecto personal · App de escritorio",
     description:
-      "API REST estilo Vinted/Wallapop para la compraventa de artículos de segunda mano entre usuarios.",
+      "Un diario infinito para PC: cada página es un lienzo sin límites para dibujar, escribir, rodear y conectar ideas. En desarrollo.",
     bullets: [
-      "Publicación de artículos con fotos, mensajería interna entre comprador y vendedor",
-      "Sistema de reportes y moderación de contenido",
-      "Panel de administración con estadísticas de uso",
-      "Documentada con Swagger",
+      "Motor de lienzo propio en TypeScript + Canvas 2D, sin dependencias de pago ni marca de agua",
+      "Trazos a mano alzada con perfect-freehand, selección por lazo, figuras y notas adhesivas",
+      "Autoguardado local en IndexedDB, con copias exportables a un formato abierto",
+      "App de escritorio con Tauri: diario flotante que aparece sobre el escritorio con un atajo de teclado",
     ],
-    stack: ["Node.js", "Express", "MySQL", "JWT", "Multer", "Angular"],
-    repoUrl: "https://github.com/javimateo/UNIR-Proyecto-Final-Backend",
+    stack: ["TypeScript", "React", "Canvas 2D", "Tauri", "Rust", "Vite"],
+    repoUrl: "https://github.com/javimateo/Diaryo",
   },
   {
     slug: "beer-league",

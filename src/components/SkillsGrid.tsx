@@ -44,10 +44,25 @@ function SkillLogo({ skill }: { skill: SkillStar }) {
 
 export default function SkillsGrid() {
   return (
-    <section className="flex w-full max-w-5xl flex-col items-center px-6 pb-32">
-      <p className="rounded-full border border-dashed border-white/20 px-4 py-1.5 font-mono text-xs uppercase tracking-widest text-foreground/50">
-        Opción B · rejilla (para comparar)
-      </p>
+    <section id="skills" className="flex w-full max-w-5xl flex-col items-center px-6 py-32">
+      <motion.p
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewport}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="font-mono text-sm uppercase tracking-widest text-accent"
+      >
+        Stack
+      </motion.p>
+      <motion.h2
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewport}
+        transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
+        className="mt-3 font-display text-4xl font-bold sm:text-5xl"
+      >
+        Con qué trabajo
+      </motion.h2>
 
       <div className="mt-16 flex w-full flex-col gap-16 md:gap-20">
         {skillConstellations.map((group) => (

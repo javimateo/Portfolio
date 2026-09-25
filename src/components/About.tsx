@@ -3,6 +3,7 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { bio, education, experience, quickFacts } from "@/data/about";
+import GithubContributions from "./GithubContributions";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
@@ -169,6 +170,8 @@ export default function About() {
           </Timeline>
         </div>
       </div>
+
+      <GithubContributions />
     </section>
   );
 }
