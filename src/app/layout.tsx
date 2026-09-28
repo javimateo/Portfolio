@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import Starfield from "@/components/Starfield";
 import Nav from "@/components/Nav";
 import LoadingProvider from "@/components/LoadingProvider";
 import "./globals.css";
+
+// Umami (self-hosted, cookie-less visit counter). Read at runtime (not NEXT_PUBLIC_, so
+// Coolify can set it without a rebuild); with either unset, nothing is loaded.
+const umamiSrc = process.env.UMAMI_SRC;
+const umamiId = process.env.UMAMI_ID;
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -32,6 +38,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {umamiSrc && umamiId && (
+          <Script
+            src={umamiSrc}
+            data-website-id={umamiId}
+            strategy="afterInteractive"
+          />
+        )}
         <LoadingProvider>
           <Starfield />
           <Nav />
