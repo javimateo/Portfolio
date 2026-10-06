@@ -9,7 +9,7 @@ import {
   useTransform,
 } from "framer-motion";
 
-const MAX_TILT = 10; // degrees
+const MAX_TILT = 5; // degrees
 
 export default function TiltPhoto({ isLoaded }: { isLoaded: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -17,7 +17,8 @@ export default function TiltPhoto({ isLoaded }: { isLoaded: boolean }) {
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
 
-  const springConfig = { stiffness: 150, damping: 18, mass: 0.5 };
+  // Slow, well-damped spring: the photo eases towards the cursor instead of snapping.
+  const springConfig = { stiffness: 60, damping: 20, mass: 1 };
   const rotateX = useSpring(
     useTransform(mouseY, [0, 1], [MAX_TILT, -MAX_TILT]),
     springConfig
@@ -50,13 +51,15 @@ export default function TiltPhoto({ isLoaded }: { isLoaded: boolean }) {
         animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="relative aspect-[3/4] w-72 shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:w-96"
+        className="relative aspect-[3/4] w-56 shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:w-72 md:w-96"
       >
         <Image
-          src="/images/javier.jpg"
+          src="/images/javier2.jpg"
+          loading="eager"
+          fetchPriority="high"
           alt="Javier Mateo"
           fill
-          sizes="(min-width: 640px) 384px, 288px"
+          sizes="(min-width: 768px) 384px, (min-width: 640px) 288px, 224px"
           className="object-cover"
         />
       </motion.div>

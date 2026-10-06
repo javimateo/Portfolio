@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useDictionary } from "@/i18n/LocaleProvider";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
@@ -31,11 +32,13 @@ const links = [
   },
 ];
 
-export default function Contact() {
+export default function Contact({ cv }: { cv?: string }) {
+  const { contact } = useDictionary();
+
   return (
     <section
-      id="contacto"
-      className="flex w-full max-w-3xl flex-col items-center px-6 py-32 text-center"
+      id="contact"
+      className="flex w-full max-w-3xl flex-col items-center py-20 text-center sm:px-6 sm:py-32"
     >
       <motion.p
         initial={{ opacity: 0, y: 24 }}
@@ -44,7 +47,7 @@ export default function Contact() {
         transition={{ duration: 0.5, ease: EASE }}
         className="font-mono text-sm uppercase tracking-widest text-accent"
       >
-        Contacto
+        {contact.eyebrow}
       </motion.p>
       <motion.h2
         initial={{ opacity: 0, y: 24 }}
@@ -53,7 +56,7 @@ export default function Contact() {
         transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
         className="mt-3 font-display text-4xl font-bold sm:text-5xl"
       >
-        ¿Hablamos?
+        {contact.title}
       </motion.h2>
       <motion.p
         initial={{ opacity: 0, y: 24 }}
@@ -62,8 +65,7 @@ export default function Contact() {
         transition={{ duration: 0.5, delay: 0.2, ease: EASE }}
         className="mt-6 max-w-lg text-lg text-foreground/70"
       >
-        Estoy buscando mi primera posición como desarrollador full-stack.
-        Si tienes un equipo donde encajar, escríbeme.
+        {contact.text}
       </motion.p>
 
       <motion.a
@@ -72,7 +74,7 @@ export default function Contact() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={viewport}
         transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
-        className="group mt-10 font-display text-2xl font-bold text-foreground transition-colors hover:text-accent sm:text-3xl"
+        className="group mt-10 font-display text-xl font-bold text-foreground transition-colors hover:text-accent sm:text-3xl"
       >
         <span className="relative">
           {EMAIL}
@@ -103,6 +105,23 @@ export default function Contact() {
           </li>
         ))}
       </motion.ul>
+
+      {cv && (
+        <motion.a
+          href={cv}
+          download
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={viewport}
+          transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
+          className="mt-8 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-foreground/60 transition-colors hover:text-accent"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                <path d="M11 3h2v10.17l3.59-3.58L18 11l-6 6-6-6 1.41-1.41L11 13.17V3ZM5 19h14v2H5v-2Z" />
+              </svg>
+          {contact.cv} (PDF)
+        </motion.a>
+      )}
     </section>
   );
 }

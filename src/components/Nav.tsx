@@ -2,21 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { LOCALE_COOKIE, localePath } from "@/i18n/config";
+import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
+import { SKIP_INTRO_KEY } from "./LoadingProvider";
 
-const LINKS = [
-  { id: "inicio", label: "Inicio" },
-  { id: "sobre-mi", label: "Sobre mí" },
-  { id: "proyectos", label: "Proyectos" },
-  { id: "skills", label: "Skills" },
-  { id: "contacto", label: "Contacto" },
-];
+const SECTION_IDS = ["home", "about", "projects", "skills", "contact"] as const;
 
 export default function Nav() {
-  const [active, setActive] = useState(LINKS[0].id);
+  const locale = useLocale();
+  const { nav } = useDictionary();
+  const [active, setActive] = useState<string>(SECTION_IDS[0]);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
+  const otherLocale = locale === "es" ? "en" : "es";
+
   useEffect(() => {
-    const sections = LINKS.map((l) => document.getElementById(l.id)).filter(
+    const sections = SECTION_IDS.map((id) => document.getElementById(id)).filter(
       (el): el is HTMLElement => el !== null
     );
     if (sections.length === 0) return;
@@ -37,25 +38,39 @@ export default function Nav() {
     return () => observer.disconnect();
   }, []);
 
+  // Remember the choice (so "/" stops guessing), keep the reader on the same section
+  // and skip the intro animation they have already seen.
+  const switchLocale = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    document.cookie = `${LOCALE_COOKIE}=${otherLocale}; path=/; max-age=31536000; samesite=lax`;
+    try {
+      sessionStorage.setItem(SKIP_INTRO_KEY, "1");
+    } catch {}
+    // A full load on purpose: the other language has its own root layout (<html lang>).
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign(`${localePath(otherLocale)}#${active}`);
+  };
+
   return (
     <nav className="fixed top-4 left-1/2 z-50 w-full max-w-fit -translate-x-1/2 px-4 sm:top-6 sm:px-0">
       <ul className="relative flex items-center gap-0.5 rounded-full border border-white/10 bg-black/60 px-1.5 py-1.5 backdrop-blur-md sm:gap-1 sm:px-2 sm:py-2">
-        {LINKS.map((link) => (
-          <li key={link.id} className="relative">
+        {SECTION_IDS.map((id) => (
+          // "Home" gives up its place to the language switch on narrow phones.
+          <li key={id} className={`relative ${id === "home" ? "hidden sm:block" : ""}`}>
             <a
               ref={(el) => {
-                linkRefs.current[link.id] = el;
+                linkRefs.current[id] = el;
               }}
-              href={`#${link.id}`}
+              href={`#${id}`}
               className={`relative z-10 block whitespace-nowrap rounded-full px-[7px] py-1.5 font-mono text-[10px] uppercase tracking-wide transition-colors sm:px-4 sm:py-2 sm:text-xs sm:tracking-wider ${
-                active === link.id
+                active === id
                   ? "text-black"
                   : "text-foreground/70 hover:text-foreground"
               }`}
             >
-              {link.label}
+              {nav[id]}
             </a>
-            {active === link.id && (
+            {active === id && (
               <motion.div
                 layoutId="nav-highlight"
                 className="absolute inset-0 z-0 rounded-full bg-accent"
@@ -64,6 +79,18 @@ export default function Nav() {
             )}
           </li>
         ))}
+        <li className="ml-0.5 border-l border-white/10 pl-0.5 sm:ml-1 sm:pl-1">
+          <a
+            href={localePath(otherLocale)}
+            hrefLang={otherLocale}
+            onClick={switchLocale}
+            aria-label={nav.switchLabel}
+            title={nav.switchLabel}
+            className="block rounded-full px-[7px] py-1.5 font-mono text-[10px] uppercase tracking-wide text-accent transition-colors hover:bg-white/10 sm:px-3 sm:py-2 sm:text-xs sm:tracking-wider"
+          >
+            {nav.switchTo}
+          </a>
+        </li>
       </ul>
     </nav>
   );

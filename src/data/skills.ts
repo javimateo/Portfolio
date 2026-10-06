@@ -1,5 +1,7 @@
+import type { Localized } from "@/i18n/config";
+
 export type SkillStar = {
-  name: string;
+  name: string | Localized;
   // file name (without extension) in public/icons/skills
   icon: string;
   // brand colour, lightened where the official one is too dark on black
@@ -14,7 +16,7 @@ export type SkillStar = {
 };
 
 export type SkillConstellation = {
-  name: string;
+  name: Localized;
   stars: SkillStar[];
   // pairs of star indexes to connect
   links: [number, number][];
@@ -24,7 +26,7 @@ const ACCENT = "#f4c430";
 
 export const skillConstellations: SkillConstellation[] = [
   {
-    name: "Frontend",
+    name: { es: "Frontend", en: "Frontend" },
     stars: [
       { name: "JavaScript", icon: "javascript", logo: "color", color: "#F7DF1E", x: 14, y: 40 },
       { name: "TypeScript", icon: "typescript", logo: "color", color: "#3178C6", x: 40, y: 28 },
@@ -41,7 +43,7 @@ export const skillConstellations: SkillConstellation[] = [
     ],
   },
   {
-    name: "Backend",
+    name: { es: "Backend", en: "Backend" },
     stars: [
       { name: "Java", icon: "java", logo: "color", color: "#F89820", x: 14, y: 36 },
       { name: "Spring Boot", icon: "springboot", logo: "color", color: "#6DB33F", x: 34, y: 56 },
@@ -59,7 +61,7 @@ export const skillConstellations: SkillConstellation[] = [
     ],
   },
   {
-    name: "Bases de datos",
+    name: { es: "Bases de datos", en: "Databases" },
     stars: [
       { name: "MySQL", icon: "mysql", color: "#5A97C8", x: 18, y: 62 },
       { name: "PostgreSQL", icon: "postgresql", logo: "color", color: "#5B84E8", x: 40, y: 30 },
@@ -73,7 +75,7 @@ export const skillConstellations: SkillConstellation[] = [
     ],
   },
   {
-    name: "Cloud y DevOps",
+    name: { es: "Cloud y DevOps", en: "Cloud & DevOps" },
     stars: [
       { name: "Git", icon: "git", logo: "color", color: "#F05032", x: 16, y: 62 },
       { name: "Docker", icon: "docker", logo: "color", color: "#2496ED", x: 36, y: 32 },
@@ -89,11 +91,11 @@ export const skillConstellations: SkillConstellation[] = [
     ],
   },
   {
-    name: "Arquitectura y redes",
+    name: { es: "Arquitectura y redes", en: "Architecture & networking" },
     stars: [
-      { name: "Microservicios", icon: "microservices", color: ACCENT, x: 22, y: 38 },
+      { name: { es: "Microservicios", en: "Microservices" }, icon: "microservices", color: ACCENT, x: 22, y: 38 },
       { name: "REST APIs", icon: "rest", color: ACCENT, x: 74, y: 34 },
-      { name: "Infraestructura de redes", icon: "network", color: ACCENT, x: 48, y: 72 },
+      { name: { es: "Infraestructura de redes", en: "Network infrastructure" }, icon: "network", color: ACCENT, x: 48, y: 72 },
     ],
     links: [
       [0, 1],
@@ -102,12 +104,12 @@ export const skillConstellations: SkillConstellation[] = [
     ],
   },
   {
-    name: "Mobile y otros",
+    name: { es: "Mobile y otros", en: "Mobile & more" },
     stars: [
       { name: "Flutter", icon: "flutter", logo: "color", color: "#54C5F8", x: 18, y: 38 },
       { name: "Android", icon: "android", logo: "color", color: "#3DDC84", x: 42, y: 68 },
       { name: "Unity", icon: "unity", logo: "badge", color: "#E5E5E5", x: 68, y: 32 },
-      { name: "Desarrollo con IA", icon: "ai", color: "#C084FC", x: 72, y: 76 },
+      { name: { es: "Desarrollo con IA", en: "AI-assisted development" }, icon: "ai", color: "#C084FC", x: 72, y: 76 },
     ],
     links: [
       [0, 1],

@@ -47,8 +47,16 @@ export default function Starfield() {
     let particles: Particle[] = [];
 
     const resize = () => {
+      const prevWidth = width;
+      const prevHeight = height;
       width = window.innerWidth;
       height = window.innerHeight;
+      // Stretch the existing stars to the new viewport, so a temporary resize (DevTools,
+      // rotating a phone) doesn't leave them bunched up in the old area.
+      for (const p of particles) {
+        p.x *= width / prevWidth;
+        p.y *= height / prevHeight;
+      }
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -91,7 +99,8 @@ export default function Starfield() {
     let rafId = 0;
 
     const tick = (now: number) => {
-      const dt = (now - lastTime) / 1000;
+      // Capped so a backgrounded tab or a long pause doesn't make every star jump at once.
+      const dt = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
       for (const p of particles) {

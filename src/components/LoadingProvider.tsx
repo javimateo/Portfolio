@@ -18,6 +18,23 @@ export function useIsLoaded() {
   return useContext(LoadingContext);
 }
 
+// Set by the language switch so the reloaded page opens without the intro.
+export const SKIP_INTRO_KEY = "skip-intro";
+
+// Read (and cleared) once per page load, so a second effect run still sees the answer.
+let skipIntro: boolean | undefined;
+function shouldSkipIntro() {
+  if (skipIntro === undefined) {
+    try {
+      skipIntro = sessionStorage.getItem(SKIP_INTRO_KEY) === "1";
+      sessionStorage.removeItem(SKIP_INTRO_KEY);
+    } catch {
+      skipIntro = false;
+    }
+  }
+  return skipIntro;
+}
+
 const DRAW_DURATION = 0.9; // hexagon "loading" draw
 const FILL_DURATION = 0.5; // hexagon fills solid + "JM" fades in
 const HOLD_MS = 400; // pause once filled, before zooming through
@@ -41,8 +58,17 @@ export default function LoadingProvider({
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = "hidden";
+    if (shouldSkipIntro()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sessionStorage only exists after mount
+      setPhase("done");
+      setIsLoaded(true);
+    }
   }, []);
+
+  // Lock scrolling while the intro covers the page.
+  useEffect(() => {
+    document.body.style.overflow = phase === "done" ? "" : "hidden";
+  }, [phase]);
 
   useEffect(() => {
     if (phase !== "fill") return;
@@ -53,7 +79,6 @@ export default function LoadingProvider({
   useEffect(() => {
     if (phase !== "zoom") return;
     const timer = setTimeout(() => {
-      document.body.style.overflow = "";
       setIsLoaded(true);
       setPhase("done");
     }, (FADE_DELAY + FADE_DURATION) * 1000);

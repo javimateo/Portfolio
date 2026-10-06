@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import TerraceLivePreview from "./TerraceLivePreview";
+import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
 
 const SPRING = { type: "spring", stiffness: 180, damping: 22 } as const;
 
@@ -44,14 +45,19 @@ function Phone({ children }: { children: ReactNode }) {
 }
 
 export default function ProjectMedia({ project }: { project: Project }) {
+  const locale = useLocale();
+  const { projects: t } = useDictionary();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
   const media = project.media;
   const frame = media?.frame ?? "browser";
-  const images = media?.images ?? [];
-  const href = project.liveUrl ?? project.repoUrl;
+  const images = !media?.images ? [] : Array.isArray(media.images) ? media.images : media.images[locale];
+  const href = project.links?.[0]?.href ?? project.repoUrl;
+  const alt = t.screenshotOf(project.title);
+  // A browser frame without a video crossfades to its second screenshot on hover.
+  const hoverImage = frame === "browser" && !media?.video ? images[1] : undefined;
 
   const startPreview = () => {
     setHovered(true);
@@ -75,9 +81,18 @@ export default function ProjectMedia({ project }: { project: Project }) {
       {media?.live === "terrace-weather" ? (
         <TerraceLivePreview />
       ) : images[0] ? (
-        <Screenshot src={images[0]} alt={`Captura de ${project.title}`} />
+        <Screenshot src={images[0]} alt={alt} />
       ) : (
         <Placeholder title={project.title} />
+      )}
+      {hoverImage && (
+        <div
+          className={`absolute inset-0 transition-opacity duration-500 ${
+            hovered ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Screenshot src={hoverImage} alt={alt} />
+        </div>
       )}
       {media?.video && (
         <video
@@ -105,7 +120,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
           <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
           <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
         </div>
-        <div className="aspect-video">{mainScreen}</div>
+        <div className={media?.live ? "aspect-[4/3] sm:aspect-video" : "aspect-video"}>{mainScreen}</div>
       </>
     );
   } else {
@@ -134,7 +149,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
               transition={SPRING}
             >
               <Phone>
-                <Screenshot src={src} alt={`Captura de ${project.title}`} />
+                <Screenshot src={src} alt={alt} />
               </Phone>
             </motion.div>
           ))}
@@ -154,7 +169,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
       href={href ?? "#"}
       target={href ? "_blank" : undefined}
       rel="noreferrer"
-      aria-label={href ? `Abrir ${project.title}` : undefined}
+      aria-label={href ? t.open(project.title) : undefined}
       aria-disabled={!href}
       onMouseEnter={startPreview}
       onMouseLeave={stopPreview}
@@ -175,7 +190,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
           <svg viewBox="0 0 24 24" className="h-3 w-3 fill-accent" aria-hidden="true">
             <path d="M8 5v14l11-7z" />
           </svg>
-          Vídeo
+          {t.video}
         </span>
       )}
     </a>

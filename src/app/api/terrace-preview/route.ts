@@ -10,8 +10,8 @@ const TIME_ZONE = "Europe/Madrid";
 const FIRST_HOUR = 12;
 const LAST_HOUR = 23;
 const SERVICES = [
-  { id: "comida", label: "Comida", start: 13, end: 16 },
-  { id: "cena", label: "Cena", start: 20, end: 23 },
+  { id: "comida", start: 13, end: 16 },
+  { id: "cena", start: 20, end: 23 },
 ];
 
 type ApiWindow = {
@@ -81,7 +81,7 @@ export async function GET() {
       const w = byId.get(s.id);
       if (!w) throw new Error(`Missing window ${s.id}`);
       return {
-        label: s.label,
+        id: s.id,
         range: `${s.start}–${s.end} h`,
         verdict: w.verdict,
         score: w.minScore,

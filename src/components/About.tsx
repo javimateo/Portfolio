@@ -4,6 +4,7 @@ import { useRef, type ReactNode } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { bio, education, experience, quickFacts } from "@/data/about";
 import GithubContributions from "./GithubContributions";
+import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
@@ -65,20 +66,23 @@ function Timeline({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export default function About() {
+  const locale = useLocale();
+  const { about } = useDictionary();
+
   return (
-    <section id="sobre-mi" className="w-full max-w-5xl px-6 py-32">
-      <div className="grid gap-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+    <section id="about" className="w-full max-w-5xl py-20 sm:px-6 sm:py-32">
+      <div className="grid gap-14 sm:gap-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
         <motion.div initial="hidden" whileInView="show" viewport={viewport} variants={stagger}>
           <motion.p
             variants={fadeUp}
             className="font-mono text-sm uppercase tracking-widest text-accent"
           >
-            Sobre mí
+            {about.eyebrow}
           </motion.p>
           <motion.h2 variants={fadeUp} className="mt-3 font-display text-4xl font-bold sm:text-5xl">
-            Quién soy
+            {about.title}
           </motion.h2>
-          {bio.map((paragraph) => (
+          {bio[locale].map((paragraph) => (
             <motion.p
               key={paragraph}
               variants={fadeUp}
@@ -89,21 +93,21 @@ export default function About() {
           ))}
           <motion.dl variants={fadeUp} className="mt-10 flex flex-col gap-4">
             {quickFacts.map((fact) => (
-              <div key={fact.label} className="border-l border-accent/40 pl-4">
+              <div key={fact.label.es} className="border-l border-accent/40 pl-4">
                 <dt className="font-mono text-xs uppercase tracking-wider text-foreground/50">
-                  {fact.label}
+                  {fact.label[locale]}
                 </dt>
-                <dd className="mt-1 text-foreground/90">{fact.value}</dd>
+                <dd className="mt-1 text-foreground/90">{fact.value[locale]}</dd>
               </div>
             ))}
           </motion.dl>
         </motion.div>
 
         <div className="flex flex-col gap-16">
-          <Timeline title="Experiencia">
+          <Timeline title={about.experience}>
             {experience.map((job) => (
               <motion.li
-                key={job.org}
+                key={job.org.es}
                 initial="hidden"
                 whileInView="show"
                 viewport={viewport}
@@ -112,17 +116,17 @@ export default function About() {
               >
                 <StarNode />
                 <motion.h3 variants={fadeUp} className="font-display text-xl font-bold">
-                  {job.role}
+                  {job.role[locale]}
                 </motion.h3>
                 <motion.p variants={fadeUp} className="mt-1 text-foreground/60">
-                  {job.org}
+                  {job.org[locale]}
                   {job.period && <span className="font-mono text-sm"> · {job.period}</span>}
                 </motion.p>
                 <motion.ul
                   variants={fadeUp}
                   className="mt-3 flex list-disc flex-col gap-2 pl-5 text-sm leading-relaxed text-foreground/70 marker:text-accent/60"
                 >
-                  {job.bullets.map((b) => (
+                  {job.bullets[locale].map((b) => (
                     <li key={b}>{b}</li>
                   ))}
                 </motion.ul>
@@ -140,10 +144,10 @@ export default function About() {
             ))}
           </Timeline>
 
-          <Timeline title="Formación">
+          <Timeline title={about.education}>
             {education.map((item) => (
               <motion.li
-                key={item.title}
+                key={item.title.es}
                 initial="hidden"
                 whileInView="show"
                 viewport={viewport}
@@ -155,15 +159,15 @@ export default function About() {
                   {item.period}
                   {item.inProgress && (
                     <span className="ml-3 rounded-full border border-accent/40 px-2 py-0.5 text-xs text-accent">
-                      En curso
+                      {about.inProgress}
                     </span>
                   )}
                 </motion.p>
                 <motion.h3 variants={fadeUp} className="mt-1 font-display text-lg font-bold">
-                  {item.title}
+                  {item.title[locale]}
                 </motion.h3>
                 <motion.p variants={fadeUp} className="mt-1 text-foreground/60">
-                  {item.school}
+                  {item.school[locale]}
                 </motion.p>
               </motion.li>
             ))}

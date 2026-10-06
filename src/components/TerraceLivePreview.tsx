@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useDictionary } from "@/i18n/LocaleProvider";
+import type { Dictionary } from "@/i18n/dictionary";
 
 type Verdict = "OPEN" | "CAUTION" | "CLOSED";
 
@@ -11,7 +13,8 @@ type Preview = {
   date: string;
   isToday: boolean;
   services: {
-    label: string;
+    // "comida" | "cena", labelled per language
+    id: string;
     range: string;
     verdict: Verdict;
     score: number;
@@ -28,8 +31,8 @@ const FALLBACK: Preview = {
   date: "2026-09-24",
   isToday: false,
   services: [
-    { label: "Comida", range: "13–16 h", verdict: "OPEN", score: 89, capacity: 100, reasons: ["Feels like 37 C (too hot)"] },
-    { label: "Cena", range: "20–23 h", verdict: "OPEN", score: 96, capacity: 100, reasons: ["Feels like 35 C (too hot)"] },
+    { id: "comida", range: "13–16 h", verdict: "OPEN", score: 89, capacity: 100, reasons: ["Feels like 37 C (too hot)"] },
+    { id: "cena", range: "20–23 h", verdict: "OPEN", score: 96, capacity: 100, reasons: ["Feels like 35 C (too hot)"] },
   ],
   hours: [100, 100, 97, 89, 86, 87, 92, 96, 97, 100, 100, 100].map((score, i) => ({
     hour: 12 + i,
@@ -38,20 +41,22 @@ const FALLBACK: Preview = {
   })),
 };
 
-const VERDICT: Record<Verdict, { label: string; color: string }> = {
-  OPEN: { label: "Abrir", color: "#4ade80" },
-  CAUTION: { label: "Precaución", color: "#fbbf24" },
-  CLOSED: { label: "Cerrar", color: "#f87171" },
+const VERDICT_COLOR: Record<Verdict, string> = {
+  OPEN: "#4ade80",
+  CAUTION: "#fbbf24",
+  CLOSED: "#f87171",
 };
 
+type TerraceText = Dictionary["terrace"];
+
 // The API reports reasons in English; these are every format it can produce.
-function translateReason(reason: string) {
+function translateReason(reason: string, r: TerraceText["reasons"]) {
   const rules: [RegExp, (m: RegExpMatchArray) => string][] = [
-    [/^Feels like (-?\d+) C \(too hot\)$/, (m) => `Sensación de ${m[1]} °C (calor)`],
-    [/^Feels like (-?\d+) C \(too cold\)$/, (m) => `Sensación de ${m[1]} °C (frío)`],
-    [/^Rain probability (\d+)%$/, (m) => `${m[1]} % de probabilidad de lluvia`],
-    [/^Expected precipitation ([\d.]+) mm$/, (m) => `${m[1]} mm de lluvia previstos`],
-    [/^Wind gusts (\d+) km\/h$/, (m) => `Rachas de ${m[1]} km/h`],
+    [/^Feels like (-?\d+) C \(too hot\)$/, (m) => r.hot(m[1])],
+    [/^Feels like (-?\d+) C \(too cold\)$/, (m) => r.cold(m[1])],
+    [/^Rain probability (\d+)%$/, (m) => r.rainChance(m[1])],
+    [/^Expected precipitation ([\d.]+) mm$/, (m) => r.rainAmount(m[1])],
+    [/^Wind gusts (\d+) km\/h$/, (m) => r.gusts(m[1])],
   ];
   for (const [pattern, format] of rules) {
     const match = reason.match(pattern);
@@ -60,17 +65,18 @@ function translateReason(reason: string) {
   return reason;
 }
 
-function formatDay(date: string, isToday: boolean) {
-  const label = new Intl.DateTimeFormat("es-ES", {
+function formatDay(date: string, isToday: boolean, t: TerraceText) {
+  const label = new Intl.DateTimeFormat(t.dateLocale, {
     weekday: "short",
     day: "numeric",
     month: "short",
     timeZone: "UTC",
   }).format(new Date(`${date}T12:00:00Z`));
-  return `${isToday ? "Hoy" : "Mañana"} · ${label}`;
+  return `${isToday ? t.today : t.tomorrow} · ${label}`;
 }
 
 export default function TerraceLivePreview() {
+  const { terrace: t } = useDictionary();
   const [data, setData] = useState<Preview | null>(null);
   const [live, setLive] = useState(true);
 
@@ -113,34 +119,34 @@ export default function TerraceLivePreview() {
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="font-display text-sm font-bold text-foreground sm:text-lg">
-            Terraza · {preview.city}
+            {t.terrace} · {preview.city}
           </p>
           <p className="font-mono text-[10px] text-foreground/50 sm:text-xs">
-            {formatDay(preview.date, preview.isToday)}
+            {formatDay(preview.date, preview.isToday, t)}
           </p>
         </div>
         <span className="flex items-center gap-1.5 rounded-full border border-white/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-foreground/60 sm:text-[10px]">
           <span
             className={`h-1.5 w-1.5 rounded-full ${live ? "animate-pulse bg-green-400" : "bg-foreground/40"}`}
           />
-          {live ? "En vivo" : "Ejemplo"}
+          {live ? t.live : t.sample}
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {preview.services.map((s) => (
-          <div key={s.label} className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 sm:px-3 sm:py-2.5">
+          <div key={s.id} className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-2 sm:px-3 sm:py-2.5">
             <p className="font-mono text-[9px] uppercase tracking-wider text-foreground/50 sm:text-[10px]">
-              {s.label} · {s.range}
+              {t.services[s.id] ?? s.id} · {s.range}
             </p>
             <p
               className="mt-0.5 font-display text-base font-bold sm:mt-1 sm:text-2xl"
-              style={{ color: VERDICT[s.verdict].color }}
+              style={{ color: VERDICT_COLOR[s.verdict] }}
             >
-              {VERDICT[s.verdict].label}
+              {t.verdict[s.verdict]}
             </p>
             <p className="font-mono text-[9px] text-foreground/60 sm:text-xs">
-              {s.score}/100 · aforo {s.capacity} %
+              {s.score}/100 · {t.capacity} {s.capacity} %
             </p>
           </div>
         ))}
@@ -157,7 +163,7 @@ export default function TerraceLivePreview() {
               className="w-full origin-bottom rounded-t-sm"
               style={{
                 height: `${Math.max(h.score, 6)}%`,
-                background: `linear-gradient(to top, ${VERDICT[h.verdict].color}33, ${VERDICT[h.verdict].color})`,
+                background: `linear-gradient(to top, ${VERDICT_COLOR[h.verdict]}33, ${VERDICT_COLOR[h.verdict]})`,
               }}
               title={`${h.hour}:00 · ${h.score}/100`}
             />
@@ -169,8 +175,8 @@ export default function TerraceLivePreview() {
       </div>
 
       <div className="hidden items-center justify-between gap-2 font-mono text-[10px] text-foreground/45 sm:flex">
-        <span>{worstReason ? translateReason(worstReason) : "Sin incidencias previstas"}</span>
-        <span>Datos: Open-Meteo</span>
+        <span>{worstReason ? translateReason(worstReason, t.reasons) : t.noIssues}</span>
+        <span>{t.source}</span>
       </div>
     </div>
   );

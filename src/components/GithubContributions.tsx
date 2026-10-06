@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useDictionary } from "@/i18n/LocaleProvider";
 
 type Day = { date: string; level: number; label: string };
 type YearData = { year: number; days: Day[]; total: number };
@@ -17,12 +18,7 @@ const LEVEL_COLOR = [
   "rgba(244,196,48,1)",
 ];
 
-const MONTHS = [
-  "ene", "feb", "mar", "abr", "may", "jun",
-  "jul", "ago", "sep", "oct", "nov", "dic",
-];
-
-function buildGrid(days: Day[]) {
+function buildGrid(days: Day[], months: string[]) {
   const sorted = [...days].sort((a, b) => a.date.localeCompare(b.date));
   if (sorted.length === 0) return { cells: [], monthMarks: [] as { week: number; label: string }[] };
 
@@ -38,7 +34,7 @@ function buildGrid(days: Day[]) {
     if (!first) continue;
     const month = new Date(`${first.date}T00:00:00Z`).getUTCMonth();
     if (month !== lastMonth) {
-      monthMarks.push({ week, label: MONTHS[month] });
+      monthMarks.push({ week, label: months[month] });
       lastMonth = month;
     }
   }
@@ -47,9 +43,11 @@ function buildGrid(days: Day[]) {
 }
 
 export default function GithubContributions() {
+  const { github } = useDictionary();
   const [years, setYears] = useState<YearData[] | null>(null);
   const [live, setLive] = useState(true);
   const [activeYear, setActiveYear] = useState<number | null>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -71,7 +69,13 @@ export default function GithubContributions() {
   }, []);
 
   const current = years?.find((y) => y.year === activeYear);
-  const grid = useMemo(() => (current ? buildGrid(current.days) : null), [current]);
+  const grid = useMemo(() => (current ? buildGrid(current.days, github.months) : null), [current, github.months]);
+
+  // On narrow screens the grid scrolls: start at the most recent weeks.
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [grid]);
 
   if (!live) return null; // no fabricated data for something this personal
 
@@ -85,10 +89,10 @@ export default function GithubContributions() {
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="font-mono text-xs uppercase tracking-widest text-accent">
-          Actividad en GitHub
+          {github.title}
         </p>
         {years && (
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {years.map((y) => (
               <button
                 key={y.year}
@@ -109,9 +113,9 @@ export default function GithubContributions() {
       {current && grid ? (
         <>
           <p className="mt-1 text-sm text-foreground/60">
-            {current.total} contribuciones en {current.year}
+            {github.total(current.total, current.year)}
           </p>
-          <div className="mt-5 overflow-x-auto">
+          <div ref={scrollerRef} className="mt-5 overflow-x-auto">
             <div className="inline-grid min-w-full gap-[3px]" style={{ gridTemplateRows: "12px repeat(7, 11px)" }}>
               <div className="relative col-span-full h-3">
                 {grid.monthMarks?.map((m) => (
@@ -144,11 +148,11 @@ export default function GithubContributions() {
             </div>
           </div>
           <div className="mt-3 flex items-center justify-end gap-1.5 font-mono text-[10px] text-foreground/40">
-            <span>Menos</span>
+            <span>{github.less}</span>
             {LEVEL_COLOR.map((color) => (
               <span key={color} className="h-[10px] w-[10px] rounded-[2px]" style={{ background: color }} />
             ))}
-            <span>Más</span>
+            <span>{github.more}</span>
           </div>
         </>
       ) : (

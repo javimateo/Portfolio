@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import TiltFrame from "./TiltFrame";
 import ProjectMedia from "./ProjectMedia";
+import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
 
 const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
 
@@ -30,6 +31,9 @@ export default function ProjectCard({
   reverse: boolean;
   mediaRef?: (el: HTMLDivElement | null) => void;
 }) {
+  const locale = useLocale();
+  const { projects: t } = useDictionary();
+
   return (
     <div
       className={`relative z-10 flex flex-col gap-8 md:gap-4 items-center ${
@@ -54,15 +58,13 @@ export default function ProjectCard({
         whileInView="show"
         viewport={viewport}
         variants={textContainer}
-        className={`w-full md:w-2/5 ${
-          reverse ? "md:text-right" : "md:text-left"
-        } text-center md:text-left`}
+        className={`w-full text-left md:w-2/5 ${reverse ? "md:text-right" : ""}`}
       >
         <motion.p
           variants={textItem}
           className="font-mono text-sm uppercase tracking-widest text-accent"
         >
-          {project.eyebrow}
+          {project.eyebrow[locale]}
         </motion.p>
         <motion.h3
           variants={textItem}
@@ -71,15 +73,15 @@ export default function ProjectCard({
           {project.title}
         </motion.h3>
         <motion.p variants={textItem} className="mt-4 text-foreground/70">
-          {project.description}
+          {project.description[locale]}
         </motion.p>
         <motion.ul
           variants={textItem}
-          className={`mt-4 flex flex-col gap-2 text-sm text-foreground/60 ${
+          className={`mt-4 flex list-disc flex-col gap-2 pl-5 text-sm text-foreground/60 marker:text-accent/60 md:list-none md:pl-0 ${
             reverse ? "md:items-end" : "md:items-start"
-          } items-center md:text-left text-center`}
+          }`}
         >
-          {project.bullets.map((bullet) => (
+          {project.bullets[locale].map((bullet) => (
             <li key={bullet} className="max-w-md">
               {bullet}
             </li>
@@ -87,9 +89,7 @@ export default function ProjectCard({
         </motion.ul>
         <motion.ul
           variants={textItem}
-          className={`mt-5 flex flex-wrap gap-2 ${
-            reverse ? "md:justify-end" : "md:justify-start"
-          } justify-center`}
+          className={`mt-5 flex flex-wrap gap-2 ${reverse ? "md:justify-end" : ""}`}
         >
           {project.stack.map((tech) => (
             <li
@@ -103,20 +103,19 @@ export default function ProjectCard({
         {project.repoUrl && (
           <motion.div
             variants={textItem}
-            className={`mt-5 flex gap-4 ${
-              reverse ? "md:justify-end" : "md:justify-start"
-            } justify-center`}
+            className={`mt-5 flex flex-wrap gap-x-4 gap-y-2 ${reverse ? "md:justify-end" : ""}`}
           >
-            {project.liveUrl && (
+            {project.links?.map((link) => (
               <a
-                href={project.liveUrl}
+                key={link.href}
+                href={link.href}
                 target="_blank"
                 rel="noreferrer"
                 className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity hover:opacity-80"
               >
-                Ver en vivo ↗
+                {link.label[locale]} ↗
               </a>
-            )}
+            ))}
             <a
               href={project.repoUrl}
               target="_blank"
@@ -132,7 +131,7 @@ export default function ProjectCard({
             variants={textItem}
             className="mt-5 font-mono text-xs uppercase tracking-wider text-foreground/40"
           >
-            Repositorio privado
+            {t.privateRepo}
           </motion.p>
         )}
       </motion.div>
