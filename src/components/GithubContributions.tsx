@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useDictionary } from "@/i18n/LocaleProvider";
+import { track } from "@/lib/analytics";
 
 type Day = { date: string; level: number; label: string };
 type YearData = { year: number; days: Day[]; total: number };
@@ -96,7 +97,10 @@ export default function GithubContributions() {
             {years.map((y) => (
               <button
                 key={y.year}
-                onClick={() => setActiveYear(y.year)}
+                onClick={() => {
+                  setActiveYear(y.year);
+                  track("github-year", { year: y.year });
+                }}
                 className={`rounded-full px-3 py-1 font-mono text-xs transition-colors ${
                   y.year === activeYear
                     ? "bg-accent text-black"

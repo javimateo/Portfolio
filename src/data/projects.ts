@@ -9,7 +9,8 @@ export type Project = {
   stack: string[];
   repoUrl?: string;
   // shown before the GitHub link; the first one is also where the preview links to
-  links?: { label: Localized; href: string }[];
+  // `kind` names the link in analytics events
+  links?: { kind: "website" | "app" | "live"; label: Localized; href: string }[];
   media?: {
     // "browser" for web apps and APIs, "phone" for mobile apps
     frame: "browser" | "phone";
@@ -49,8 +50,8 @@ export const projects: Project[] = [
     stack: ["TypeScript", "React", "Canvas 2D", "Tauri", "Rust", "Vite", "IndexedDB"],
     repoUrl: "https://github.com/javimateo/Diaryo",
     links: [
-      { label: { es: "Web y descarga", en: "Website & download" }, href: "https://diaryo.javiermateo.dev/" },
-      { label: { es: "Probar en el navegador", en: "Try it in the browser" }, href: "https://app.diaryo.javiermateo.dev/" },
+      { kind: "website", label: { es: "Web y descarga", en: "Website & download" }, href: "https://diaryo.javiermateo.dev/" },
+      { kind: "app", label: { es: "Probar en el navegador", en: "Try it in the browser" }, href: "https://app.diaryo.javiermateo.dev/" },
     ],
     media: {
       frame: "browser",
@@ -116,7 +117,7 @@ export const projects: Project[] = [
     stack: ["Java", "Spring Boot", "Docker", "OpenAPI", "Open-Meteo"],
     repoUrl: "https://github.com/javimateo/terrace-weather-api",
     links: [
-      { label: { es: "Ver en vivo", en: "Live demo" }, href: "https://terrace.javiermateo.dev/swagger-ui.html" },
+      { kind: "live", label: { es: "Ver en vivo", en: "Live demo" }, href: "https://terrace.javiermateo.dev/swagger-ui.html" },
     ],
     media: {
       frame: "browser",

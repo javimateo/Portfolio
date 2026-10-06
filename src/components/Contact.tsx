@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useDictionary } from "@/i18n/LocaleProvider";
+import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
+import { track } from "@/lib/analytics";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
@@ -33,6 +34,7 @@ const links = [
 ];
 
 export default function Contact({ cv }: { cv?: string }) {
+  const locale = useLocale();
   const { contact } = useDictionary();
 
   return (
@@ -70,6 +72,7 @@ export default function Contact({ cv }: { cv?: string }) {
 
       <motion.a
         href={`mailto:${EMAIL}`}
+        onClick={() => track("contact-click", { channel: "email", from: "address" })}
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={viewport}
@@ -93,6 +96,7 @@ export default function Contact({ cv }: { cv?: string }) {
           <li key={link.label}>
             <a
               href={link.href}
+              onClick={() => track("contact-click", { channel: link.label.toLowerCase(), from: "icons" })}
               target={link.href.startsWith("http") ? "_blank" : undefined}
               rel={link.href.startsWith("http") ? "noreferrer" : undefined}
               aria-label={link.label}
@@ -110,6 +114,7 @@ export default function Contact({ cv }: { cv?: string }) {
         <motion.a
           href={cv}
           download
+          onClick={() => track("cv-download", { lang: locale, from: "contact" })}
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewport}

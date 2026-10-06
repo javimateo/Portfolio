@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import type { Project } from "@/data/projects";
 import TerraceLivePreview from "./TerraceLivePreview";
 import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
+import { track } from "@/lib/analytics";
 
 const SPRING = { type: "spring", stiffness: 180, damping: 22 } as const;
 
@@ -66,6 +67,10 @@ export default function ProjectMedia({ project }: { project: Project }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  // A hover counts as interest once it lasts a moment (not the cursor passing through),
+  // and only the first one per page view is reported.
+  const hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hoverTracked = useRef(false);
 
   const media = project.media;
   const frame = media?.frame ?? "browser";
@@ -77,6 +82,12 @@ export default function ProjectMedia({ project }: { project: Project }) {
 
   const startPreview = () => {
     setHovered(true);
+    if (!hoverTracked.current) {
+      hoverTimer.current = setTimeout(() => {
+        hoverTracked.current = true;
+        track("project-preview", { project: project.slug });
+      }, 800);
+    }
     const video = videoRef.current;
     if (!video || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     video.play().catch(() => {});
@@ -84,6 +95,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
 
   const stopPreview = () => {
     setHovered(false);
+    clearTimeout(hoverTimer.current);
     const video = videoRef.current;
     if (!video) return;
     video.pause();
@@ -187,6 +199,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
       rel="noreferrer"
       aria-label={href ? t.open(project.title) : undefined}
       aria-disabled={!href}
+      onClick={() => href && track("project-link", { project: project.slug, link: "preview" })}
       onMouseEnter={startPreview}
       onMouseLeave={stopPreview}
       onFocus={startPreview}

@@ -5,6 +5,7 @@ import type { Project } from "@/data/projects";
 import TiltFrame from "./TiltFrame";
 import ProjectMedia from "./ProjectMedia";
 import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
+import { track } from "@/lib/analytics";
 
 const viewport = { once: true, margin: "0px 0px -15% 0px" } as const;
 
@@ -109,6 +110,7 @@ export default function ProjectCard({
               <a
                 key={link.href}
                 href={link.href}
+                onClick={() => track("project-link", { project: project.slug, link: link.kind })}
                 target="_blank"
                 rel="noreferrer"
                 className="font-mono text-xs uppercase tracking-wider text-accent transition-opacity hover:opacity-80"
@@ -118,6 +120,7 @@ export default function ProjectCard({
             ))}
             <a
               href={project.repoUrl}
+              onClick={() => track("project-link", { project: project.slug, link: "github" })}
               target="_blank"
               rel="noreferrer"
               className="font-mono text-xs uppercase tracking-wider text-foreground/70 transition-colors hover:text-accent"

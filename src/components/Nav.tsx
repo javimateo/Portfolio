@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { LOCALE_COOKIE, localePath } from "@/i18n/config";
 import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
 import { SKIP_INTRO_KEY } from "./LoadingProvider";
+import { track } from "@/lib/analytics";
 
 const SECTION_IDS = ["home", "about", "projects", "skills", "contact"] as const;
 
@@ -46,9 +47,13 @@ export default function Nav() {
     try {
       sessionStorage.setItem(SKIP_INTRO_KEY, "1");
     } catch {}
+    track("language-switch", { to: otherLocale, section: active });
     // A full load on purpose: the other language has its own root layout (<html lang>).
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.assign(`${localePath(otherLocale)}#${active}`);
+    // The short delay lets the event request start before the page goes away.
+    setTimeout(() => {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign(`${localePath(otherLocale)}#${active}`);
+    }, 150);
   };
 
   return (
@@ -62,6 +67,7 @@ export default function Nav() {
                 linkRefs.current[id] = el;
               }}
               href={`#${id}`}
+              onClick={() => track("nav-click", { section: id })}
               className={`relative z-10 block whitespace-nowrap rounded-full px-[7px] py-1.5 font-mono text-[10px] uppercase tracking-wide transition-colors sm:px-4 sm:py-2 sm:text-xs sm:tracking-wider ${
                 active === id
                   ? "text-black"

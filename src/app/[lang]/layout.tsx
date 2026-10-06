@@ -5,6 +5,7 @@ import Script from "next/script";
 import Starfield from "@/components/Starfield";
 import Nav from "@/components/Nav";
 import LoadingProvider from "@/components/LoadingProvider";
+import Analytics from "@/components/Analytics";
 import LocaleProvider from "@/i18n/LocaleProvider";
 import { hasLocale, localePath, locales } from "@/i18n/config";
 import { dictionary } from "@/i18n/dictionary";
@@ -70,6 +71,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
         <LocaleProvider locale={lang}>
           <LoadingProvider>
             <Starfield />
+            <Analytics />
             <Nav />
             <div className="relative z-10 flex min-h-full flex-1 flex-col">
               {children}

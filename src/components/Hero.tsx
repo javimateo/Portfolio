@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import TiltPhoto from "./TiltPhoto";
 import { useIsLoaded } from "./LoadingProvider";
-import { useDictionary } from "@/i18n/LocaleProvider";
+import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
+import { track } from "@/lib/analytics";
 
 const container = {
   hidden: {},
@@ -26,6 +27,7 @@ const item = {
 
 export default function Hero({ cv }: { cv?: string }) {
   const isLoaded = useIsLoaded();
+  const locale = useLocale();
   const { hero } = useDictionary();
 
   return (
@@ -63,12 +65,14 @@ export default function Hero({ cv }: { cv?: string }) {
         >
           <a
             href="#projects"
+            onClick={() => track("hero-cta", { target: "projects" })}
             className="rounded-full bg-accent px-5 py-3 font-mono text-xs sm:px-7 sm:py-3.5 sm:text-sm uppercase tracking-wider text-black transition-transform hover:scale-105"
           >
             {hero.projects}
           </a>
           <a
             href="#contact"
+            onClick={() => track("hero-cta", { target: "contact" })}
             className="rounded-full border border-white/20 px-5 py-3 font-mono text-xs sm:px-7 sm:py-3.5 sm:text-sm uppercase tracking-wider text-foreground transition-colors hover:border-accent hover:text-accent"
           >
             {hero.contact}
@@ -77,6 +81,7 @@ export default function Hero({ cv }: { cv?: string }) {
             <a
               href={cv}
               download
+              onClick={() => track("cv-download", { lang: locale, from: "hero" })}
               className="flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 font-mono text-xs sm:px-7 sm:py-3.5 sm:text-sm uppercase tracking-wider text-foreground transition-colors hover:border-accent hover:text-accent"
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">

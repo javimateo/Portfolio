@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { contributions } from "@/data/contributions";
 import { useDictionary, useLocale } from "@/i18n/LocaleProvider";
+import { track } from "@/lib/analytics";
 
 const container = {
   hidden: {},
@@ -55,6 +56,7 @@ export default function OpenSourceContributions() {
             key={c.prUrl}
             variants={item}
             href={c.prUrl}
+            onClick={() => track("open-source-click", { repo: c.repo })}
             target="_blank"
             rel="noreferrer"
             className="group flex flex-col gap-2 rounded-xl border border-white/10 p-5 transition-colors hover:border-accent/50 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
