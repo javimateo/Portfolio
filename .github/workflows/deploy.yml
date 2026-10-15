@@ -1,0 +1,65 @@
+# Builds the Docker image on GitHub's runners (the VPS doesn't have the RAM for `next build`
+# next to everything else it runs), pushes it to GitHub Container Registry and asks Coolify
+# to pull it and restart the app.
+#
+# Repository settings it reads (Settings → Secrets and variables → Actions):
+#   variables: UMAMI_SRC, UMAMI_ID   (public values; baked into the static HTML at build time)
+#   secrets:   COOLIFY_WEBHOOK       (the app's "Deploy Webhook" URL in Coolify)
+#              COOLIFY_TOKEN         (a Coolify API token with deploy permission)
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+env:
+  # GHCR names must be lowercase.
+  IMAGE: ghcr.io/javimateo/portfolio
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          build-args: |
+            UMAMI_SRC=${{ vars.UMAMI_SRC }}
+            UMAMI_ID=${{ vars.UMAMI_ID }}
+          # Reuses the npm install layer between runs when package-lock.json hasn't changed.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy on Coolify
+        env:
+          COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          if [ -z "$COOLIFY_WEBHOOK" ]; then
+            echo "COOLIFY_WEBHOOK not set: image pushed, deploy it from Coolify."
+            exit 0
+          fi
+          curl --fail --silent --show-error -H "Authorization: Bearer $COOLIFY_TOKEN" "$COOLIFY_WEBHOOK"

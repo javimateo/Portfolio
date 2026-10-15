@@ -11,8 +11,9 @@ import { hasLocale, localePath, locales } from "@/i18n/config";
 import { dictionary } from "@/i18n/dictionary";
 import "../globals.css";
 
-// Umami (self-hosted, cookie-less visit counter). Read at runtime (not NEXT_PUBLIC_, so
-// Coolify can set it without a rebuild); with either unset, nothing is loaded.
+// Umami (self-hosted, cookie-less visit counter). The pages are prerendered, so these are
+// read at build time (the Dockerfile takes them as build args); with either unset, nothing
+// is loaded.
 const umamiSrc = process.env.UMAMI_SRC;
 const umamiId = process.env.UMAMI_ID;
 

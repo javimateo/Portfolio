@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   experimental: {
-    // The VPS builds next to other running services: one worker for page generation
-    // keeps the build's peak memory low (there are only a handful of pages anyway).
+    // One worker for page generation keeps the build's peak memory low (there are only a
+    // handful of pages anyway), in case it ever has to build on the VPS again.
     cpus: 1,
   },
 };

@@ -9,6 +9,11 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# The pages are prerendered, so the Umami script tag is written into the HTML here, at build
+# time (passed by the GitHub workflow; empty means no analytics).
+ARG UMAMI_SRC=""
+ARG UMAMI_ID=""
+ENV UMAMI_SRC=$UMAMI_SRC UMAMI_ID=$UMAMI_ID
 # Fonts (next/font/google) and any other build-time fetch need network access, which this stage has.
 RUN npm run build
 
