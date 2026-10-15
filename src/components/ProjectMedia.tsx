@@ -18,22 +18,7 @@ function Placeholder({ title }: { title: string }) {
   );
 }
 
-// Phone screens are small; a browser frame spans most of the card and holds small UI
-// text, so it asks for a much wider image at a higher quality.
-const SCREENSHOT = {
-  phone: { sizes: "(min-width: 768px) 260px, 40vw", quality: 75 },
-  browser: { sizes: "(min-width: 1024px) 600px, (min-width: 768px) 60vw, 100vw", quality: 90 },
-} as const;
-
-function Screenshot({
-  src,
-  alt,
-  frame,
-}: {
-  src: string;
-  alt: string;
-  frame: keyof typeof SCREENSHOT;
-}) {
+function Screenshot({ src, alt }: { src: string; alt: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) return <Placeholder title="" />;
   return (
@@ -41,8 +26,6 @@ function Screenshot({
       src={src}
       alt={alt}
       fill
-      sizes={SCREENSHOT[frame].sizes}
-      quality={SCREENSHOT[frame].quality}
       className="object-cover object-top"
       onError={() => setFailed(true)}
     />
@@ -109,7 +92,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
       {media?.live === "terrace-weather" ? (
         <TerraceLivePreview />
       ) : images[0] ? (
-        <Screenshot src={images[0]} alt={alt} frame={frame} />
+        <Screenshot src={images[0]} alt={alt} />
       ) : (
         <Placeholder title={project.title} />
       )}
@@ -119,7 +102,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
             hovered ? "opacity-100" : "opacity-0"
           }`}
         >
-          <Screenshot src={hoverImage} alt={alt} frame={frame} />
+          <Screenshot src={hoverImage} alt={alt} />
         </div>
       )}
       {media?.video && (
@@ -177,7 +160,7 @@ export default function ProjectMedia({ project }: { project: Project }) {
               transition={SPRING}
             >
               <Phone>
-                <Screenshot src={src} alt={alt} frame="phone" />
+                <Screenshot src={src} alt={alt} />
               </Phone>
             </motion.div>
           ))}

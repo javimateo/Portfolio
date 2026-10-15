@@ -54,7 +54,7 @@ export default function TiltPhoto({ isLoaded }: { isLoaded: boolean }) {
         className="relative aspect-[3/4] w-56 shrink-0 overflow-hidden rounded-2xl border border-white/10 sm:w-72 md:w-96"
       >
         <Image
-          src="/images/javier2.jpg"
+          src="/images/javier.webp"
           loading="eager"
           fetchPriority="high"
           alt="Javier Mateo"

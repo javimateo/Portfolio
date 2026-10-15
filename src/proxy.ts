@@ -26,12 +26,6 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const url = request.nextUrl.clone();
 
-  // /es is an implementation detail: keep a single public URL for the Spanish page.
-  if (pathname === "/es" || pathname.startsWith("/es/")) {
-    url.pathname = pathname.slice(3) || "/";
-    return NextResponse.redirect(url);
-  }
-
   if (pathname === "/") {
     if (prefersEnglish(request)) {
       url.pathname = "/en";
@@ -42,6 +36,9 @@ export function proxy(request: NextRequest) {
   }
 }
 
+// Only "/": the standalone server (Dockerfile) runs the proxy again for the rewritten /es
+// request, so redirecting /es back to "/" here would loop forever. /es stays reachable and
+// its canonical link points search engines at "/".
 export const config = {
-  matcher: ["/", "/es", "/es/:path*"],
+  matcher: ["/"],
 };

@@ -5,8 +5,10 @@ const nextConfig: NextConfig = {
   // copied into the runtime stage of the Dockerfile instead of the whole node_modules tree.
   output: "standalone",
   images: {
-    // 90 is for the browser-frame screenshots, whose small UI text blurs at 75.
-    qualities: [75, 90],
+    // Images in public/ are already exported at the size they're shown (WebP, a few dozen
+    // KB each), so they're served as-is. Next's on-the-fly optimiser (sharp) would add
+    // ~100–250 MB of RAM to the server for no visible gain.
+    unoptimized: true,
   },
   experimental: {
     // The VPS builds next to other running services: one worker for page generation

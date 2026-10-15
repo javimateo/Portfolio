@@ -86,9 +86,9 @@ export const projects: Project[] = [
     media: {
       frame: "phone",
       images: [
-        "/projects/beer-league/01-home.png",
-        "/projects/beer-league/02-group-ranking.png",
-        "/projects/beer-league/08-confirmation.png",
+        "/projects/beer-league/01-home.webp",
+        "/projects/beer-league/02-group-ranking.webp",
+        "/projects/beer-league/08-confirmation.webp",
       ],
     },
   },
