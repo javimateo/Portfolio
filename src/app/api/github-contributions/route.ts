@@ -5,7 +5,9 @@
 // markup, this route just starts returning `ok: false` and the widget falls
 // back to a static snapshot; nothing else on the site depends on it.
 
-export const revalidate = 86400; // GitHub's own calendar is cached ~1 day too
+// Every 3 hours. The first visit after that still gets the previous copy while a fresh one
+// is fetched in the background, so a longer period shows noticeably stale data.
+export const revalidate = 10800;
 
 const USERNAME = "javimateo";
 const CURRENT_YEAR = new Date().getUTCFullYear();

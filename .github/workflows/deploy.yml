@@ -2,10 +2,11 @@
 # next to everything else it runs), pushes it to GitHub Container Registry and asks Coolify
 # to pull it and restart the app.
 #
-# Repository settings it reads (Settings → Secrets and variables → Actions):
-#   variables: UMAMI_SRC, UMAMI_ID   (public values; baked into the static HTML at build time)
-#   secrets:   COOLIFY_WEBHOOK       (the app's "Deploy Webhook" URL in Coolify)
-#              COOLIFY_TOKEN         (a Coolify API token with deploy permission)
+# Settings it reads, from the "Portfolio" environment (Settings → Environments → Portfolio):
+#   UMAMI_SRC, UMAMI_ID   baked into the static HTML at build time (public values, so they
+#                         may be secrets or variables)
+#   COOLIFY_WEBHOOK       secret: the app's "Deploy Webhook" URL in Coolify
+#   COOLIFY_TOKEN         secret: a Coolify API token with deploy permission
 name: Build and deploy
 
 on:
@@ -24,6 +25,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Portfolio
     permissions:
       contents: read
       packages: write
@@ -47,8 +49,8 @@ jobs:
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:${{ github.sha }}
           build-args: |
-            UMAMI_SRC=${{ vars.UMAMI_SRC }}
-            UMAMI_ID=${{ vars.UMAMI_ID }}
+            UMAMI_SRC=${{ secrets.UMAMI_SRC || vars.UMAMI_SRC }}
+            UMAMI_ID=${{ secrets.UMAMI_ID || vars.UMAMI_ID }}
           # Reuses the npm install layer between runs when package-lock.json hasn't changed.
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -94,7 +94,8 @@ export default function GithubContributions() {
         </p>
         {years && (
           <div className="flex flex-wrap gap-1">
-            {years.map((y) => (
+            {/* The first entry is GitHub's rolling last 12 months, not a calendar year. */}
+            {years.map((y, i) => (
               <button
                 key={y.year}
                 onClick={() => {
@@ -107,7 +108,7 @@ export default function GithubContributions() {
                     : "text-foreground/50 hover:text-foreground"
                 }`}
               >
-                {y.year}
+                {i === 0 ? github.lastYearTab : y.year}
               </button>
             ))}
           </div>
@@ -117,7 +118,9 @@ export default function GithubContributions() {
       {current && grid ? (
         <>
           <p className="mt-1 text-sm text-foreground/60">
-            {github.total(current.total, current.year)}
+            {current === years?.[0]
+              ? github.lastYear(current.total)
+              : github.total(current.total, current.year)}
           </p>
           <div ref={scrollerRef} className="mt-5 overflow-x-auto">
             <div className="inline-grid min-w-full gap-[3px]" style={{ gridTemplateRows: "12px repeat(7, 11px)" }}>

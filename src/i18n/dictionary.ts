@@ -34,6 +34,8 @@ const es = {
   github: {
     title: "Actividad en GitHub",
     total: (count: number, year: number) => `${count} contribuciones en ${year}`,
+    lastYear: (count: number) => `${count} contribuciones en el último año`,
+    lastYearTab: "Último año",
     less: "Menos",
     more: "Más",
     months: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
@@ -120,6 +122,8 @@ const en: Dictionary = {
   github: {
     title: "GitHub activity",
     total: (count: number, year: number) => `${count} contributions in ${year}`,
+    lastYear: (count: number) => `${count} contributions in the last year`,
+    lastYearTab: "Last year",
     less: "Less",
     more: "More",
     months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
